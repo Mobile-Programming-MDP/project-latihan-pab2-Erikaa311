@@ -1,0 +1,22 @@
+[
+    {
+        "nama" : "erika",
+        "umur" : 20,
+        "alamat" : {
+            "jalan": "jl. rajawali",
+            "kota": "palembang",
+            "provinsi": "SUMSEL"
+        },
+        "hobi" : ["membaca", "jalan-jalan"]
+    },
+    {
+        "nama" : "syafira",
+        "umur" : 19,
+        "alamat" : {
+            "jalan": "jl. plaju",
+            "kota": "palembang",
+            "provinsi": "SUMSEL"
+        },
+        "hobi" : ["makan", "tidur"]
+    }
+]
