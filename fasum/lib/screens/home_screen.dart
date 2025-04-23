@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  String formaTime(DateTime dateTime) {
+  String formatTime(DateTime dateTime) {
     final now = DateTime.now();
     final diff = now.difference(dateTime);
     if (diff.inSeconds < 60) {
@@ -24,8 +24,7 @@ class HomeScreen extends StatelessWidget {
   Future<void> signOut(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const SignInScreen()),
-    );
+        MaterialPageRoute(builder: (context) => const SignInScreen()));
   }
 
   @override
@@ -40,33 +39,60 @@ class HomeScreen extends StatelessWidget {
               signOut(context);
             },
             icon: const Icon(Icons.logout),
-          ),
+          )
         ],
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("posts")
-            .orderBy('createAt',
-                descending: true) // Perbaikan: Hapus tanda ":" yang salah
+            //.orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          if (!snapshot.hasData)
+            return Center(child: CircularProgressIndicator());
 
           final posts = snapshot.data!.docs;
           return ListView.builder(
-            itemCount: posts.length, // Menambahkan itemCount di sini
-            itemBuilder: (context, index) {
+            itemCount: posts.length,
+            itemBuilder: (contex, index) {
               final data = posts[index].data();
-              final imageBase64 = data['image'];
-              final description = data['description'];
-              final createAtStrs = data['createAt'];
+              //final imageBase64 = data['image'] ?? '';
+              final description = data['description'] ?? '';
+              //final createdAtStr = data['cratedAt'] ?? '';
               final fullName = data['fullName'] ?? 'Anonim';
+
+              //parse ke DateTime
+              //final createdAt = DateTime.parse(createdAtStr);
+              return Card(
+                margin: const EdgeInsets.all(10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      fullName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      description ?? '',
+                      style: const TextStyle(fontSize: 16),
+                    )
+                  ],
+                ),
+              );
             },
           );
         },
-        // parse ke date timne
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: const Icon(Icons.add),
       ),
     );
   }
