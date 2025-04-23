@@ -55,6 +55,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '737715652352',
     projectId: 'fasum-apps-123',
     authDomain: 'fasum-apps-123.firebaseapp.com',
+    databaseURL: 'https://fasum-apps-123-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'fasum-apps-123.firebasestorage.app',
   );
 
@@ -63,6 +64,8 @@ class DefaultFirebaseOptions {
     appId: '1:737715652352:android:6b20f5aa9b21d4b13f95e5',
     messagingSenderId: '737715652352',
     projectId: 'fasum-apps-123',
+    databaseURL: 'https://fasum-apps-123-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'fasum-apps-123.firebasestorage.app',
   );
+
 }
