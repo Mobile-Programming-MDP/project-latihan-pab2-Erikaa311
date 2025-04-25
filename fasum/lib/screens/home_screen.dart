@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fasum/screens/add_post_screen.dart';
 import 'package:fasum/screens/sign_in_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -45,24 +48,24 @@ class HomeScreen extends StatelessWidget {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("posts")
-            //.orderBy('createdAt', descending: true)
+            .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData)
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
 
           final posts = snapshot.data!.docs;
           return ListView.builder(
             itemCount: posts.length,
-            itemBuilder: (contex, index) {
+            itemBuilder: (context, index) {
               final data = posts[index].data();
-              //final imageBase64 = data['image'] ?? '';
-              final description = data['description'] ?? '';
-              //final createdAtStr = data['cratedAt'] ?? '';
+              final imageBase64 = data['image'];
+              final description = data['description'];
+              final createdAtStr = data['createdAt'];
               final fullName = data['fullName'] ?? 'Anonim';
 
               //parse ke DateTime
-              //final createdAt = DateTime.parse(createdAtStr);
+              final createdAt = DateTime.parse(createdAtStr);
               return Card(
                 margin: const EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(
@@ -71,18 +74,47 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      fullName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                    if (imageBase64 != null)
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(10)),
+                        child: Image.memory(base64Decode(imageBase64),
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: 200),
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                formatTime(createdAt),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.grey),
+                              ),
+                              Text(
+                                fullName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            description ?? '',
+                            style: const TextStyle(fontSize: 16),
+                          )
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      description ?? '',
-                      style: const TextStyle(fontSize: 16),
-                    )
                   ],
                 ),
               );
@@ -91,7 +123,11 @@ class HomeScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => AddPostScreen()),
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );
