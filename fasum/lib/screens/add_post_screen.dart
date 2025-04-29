@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,35 +9,36 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({super.key});
+
   @override
   State<AddPostScreen> createState() => _AddPostScreenState();
 }
 
 class _AddPostScreenState extends State<AddPostScreen> {
-  File? _image;
+  Uint8List? _image;
   String? _base64Image;
   final TextEditingController _descriptionController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   bool _isUploading = false;
   double? _latitude;
   double? _longitude;
+
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
       setState(() {
-        _image = File(pickedFile.path);
+        _image = bytes;
       });
-      await _compressAndEncodeImage();
+      await _compressAndEncodeImage(bytes);
     }
   }
 
-  Future<void> _compressAndEncodeImage() async {
-    if (_image == null) return;
-    final compressedImage = await FlutterImageCompress.compressWithFile(
-      _image!.path,
+  Future<void> _compressAndEncodeImage(Uint8List imageBytes) async {
+    final compressedImage = await FlutterImageCompress.compressWithList(
+      imageBytes,
       quality: 50,
     );
-    if (compressedImage == null) return;
     setState(() {
       _base64Image = base64Encode(compressedImage);
     });
@@ -46,10 +47,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
   Future<void> _getLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
+
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       throw Exception('Location services are disabled.');
     }
+
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -58,6 +61,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
         throw Exception('Location permissions are denied.');
       }
     }
+
     try {
       final position = await Geolocator.getCurrentPosition(
         locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
@@ -80,19 +84,21 @@ class _AddPostScreenState extends State<AddPostScreen> {
     setState(() => _isUploading = true);
     final now = DateTime.now().toIso8601String();
     final uid = FirebaseAuth.instance.currentUser?.uid;
+
     if (uid == null) {
       setState(() => _isUploading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User not found.')),
+        const SnackBar(content: Text('User not found.')),
       );
       return;
     }
+
     try {
       await _getLocation();
-      // Ambil nama lengkap dari koleksi users
       final userDoc =
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
       final fullName = userDoc.data()?['fullName'] ?? 'Anonymous';
+
       await FirebaseFirestore.instance.collection('posts').add({
         'image': _base64Image,
         'description': _descriptionController.text,
@@ -100,8 +106,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
         'latitude': _latitude,
         'longitude': _longitude,
         'fullName': fullName,
-        'userId': uid, // optional: jika ingin simpan UID juga
+        'userId': uid,
       });
+
       if (!mounted) return;
       Navigator.pop(context);
     } catch (e) {
@@ -109,7 +116,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       if (!mounted) return;
       setState(() => _isUploading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to upload the post.')),
+        const SnackBar(content: Text('Failed to upload the post.')),
       );
     }
   }
@@ -118,21 +125,21 @@ class _AddPostScreenState extends State<AddPostScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Choose Image Source"),
+        title: const Text("Choose Image Source"),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _pickImage(ImageSource.camera);
             },
-            child: Text("Camera"),
+            child: const Text("Camera"),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _pickImage(ImageSource.gallery);
             },
-            child: Text("Gallery"),
+            child: const Text("Gallery"),
           ),
         ],
       ),
@@ -142,13 +149,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Post')),
+      appBar: AppBar(title: const Text('Add Post')),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _image != null
-                ? Image.file(
+                ? Image.memory(
                     _image!,
                     height: 200,
                     width: double.infinity,
@@ -159,28 +166,28 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     child: Container(
                       height: 200,
                       color: Colors.grey[300],
-                      child: Center(
+                      child: const Center(
                         child: Icon(Icons.add_a_photo, size: 50),
                       ),
                     ),
                   ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
               textCapitalization: TextCapitalization.sentences,
               maxLines: 3,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Add a brief description...',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _isUploading
-                ? CircularProgressIndicator()
+                ? const CircularProgressIndicator()
                 : ElevatedButton.icon(
                     onPressed: _submitPost,
-                    icon: Icon(Icons.upload),
-                    label: Text('Post'),
+                    icon: const Icon(Icons.upload),
+                    label: const Text('Post'),
                   ),
           ],
         ),
