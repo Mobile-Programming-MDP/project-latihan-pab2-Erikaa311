@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -72,7 +71,15 @@ class _DetailScreenState extends State<DetailScreen> {
                   top: 12,
                   right: 12,
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              FullImageScreen(imageBase64: widget.imageBase64),
+                        ),
+                      );
+                    },
                     icon: const Icon(
                       Icons.fullscreen,
                       color: Colors.white,

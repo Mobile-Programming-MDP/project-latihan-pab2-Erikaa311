@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fasum/screens/add_post_screen.dart';
 import 'package:fasum/screens/sign_in_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -63,9 +64,12 @@ class HomeScreen extends StatelessWidget {
               final description = data['description'];
               final createdAtStr = data['createdAt'];
               final fullName = data['fullName'] ?? 'Anonim';
-
+              final latitude = data['latitude'];
+              final longitude = data['longitude'];
+              final category = data['category'];
               //parse ke DateTime
               final createdAt = DateTime.parse(createdAtStr);
+              String heroTag = 'fasum-image-$(createdAt.millisecondSinceEp)'
               return Card(
                 margin: const EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(
