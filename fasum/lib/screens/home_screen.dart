@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fasum/screens/add_post_screen.dart';
+import 'package:fasum/screens/detail_screen.dart';
 import 'package:fasum/screens/sign_in_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -56,6 +56,9 @@ class HomeScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
 
           final posts = snapshot.data!.docs;
+
+          //Script lengkap bagian ListView.builder
+          //https://pastebin.com/kSXM5mTX
           return ListView.builder(
             itemCount: posts.length,
             itemBuilder: (context, index) {
@@ -66,11 +69,28 @@ class HomeScreen extends StatelessWidget {
               final fullName = data['fullName'] ?? 'Anonim';
               final latitude = data['latitude'];
               final longitude = data['longitude'];
-              final category = data['category'];
+              final category = data['category'] ?? 'Lainnya';
               //parse ke DateTime
               final createdAt = DateTime.parse(createdAtStr);
-              String heroTag = 'fasum-image-$(createdAt.millisecondSinceEp)'
-              return Card(
+              String heroTag = 'fasum-image-${createdAt.millisecondsSinceEpoch}';
+              return InkWell(
+                onTap:  (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DetailScreen(
+                                imageBase64: imageBase64,
+                                description: description,
+                                createdAt: createdAt,
+                                fullName: fullName,
+                                latitude: latitude,
+                                longitude: longitude,
+                                category: category,
+                                heroTag: heroTag),
+                        ),
+                    );
+                 },
+              child:  Card(
                 margin: const EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -116,10 +136,11 @@ class HomeScreen extends StatelessWidget {
                             description ?? '',
                             style: const TextStyle(fontSize: 16),
                           )
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

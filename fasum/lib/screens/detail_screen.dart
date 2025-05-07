@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fasum/screens/full_image_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,6 +31,7 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+    //install dependensi url_launcher : flutter pub add url_launcher
   Future<void> openMap() async {
     final uri = Uri.parse(
         "https://www.google.com/maps/search/?api=1&query=${widget.latitude},${widget.longitude}");
@@ -155,7 +157,17 @@ class _DetailScreenState extends State<DetailScreen> {
                   Text(
                     widget.description,
                     style: const TextStyle(fontSize: 16),
-                  )
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                   "Lokasi",
+                   style: const TextStyle(
+                    fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "${widget.latitude}, ${widget.longitude}",
+                    style: const TextStyle(fontSize: 12),
+                    ),
                 ],
               ),
             )
