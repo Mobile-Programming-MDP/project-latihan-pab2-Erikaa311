@@ -63,9 +63,7 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
 
     if (currentUser == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text("My Posts"),
-        ),
+        appBar: AppBar(title: const Text("My Posts")),
         body: const Center(
           child: Text("You need to log in to view your posts."),
         ),
@@ -73,15 +71,14 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("My Posts"),
-      ),
+      appBar: AppBar(title: const Text("My Posts")),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection("posts")
-            .where("userId", isEqualTo: currentUser.uid)
-            .orderBy('createdAt', descending: true)
-            .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection("posts")
+                .where("userId", isEqualTo: currentUser.uid)
+                .orderBy('createdAt', descending: true)
+                .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             print("Trapped in has error ${!snapshot.hasData}");
@@ -128,16 +125,17 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DetailScreen(
-                          imageBase64: imageBase64,
-                          description: description,
-                          createdAt: createdAt,
-                          fullName: fullName,
-                          latitude: latitude,
-                          longitude: longitude,
-                          category: category,
-                          heroTag: heroTag,
-                        ),
+                        builder:
+                            (context) => DetailScreen(
+                              imageBase64: imageBase64,
+                              description: description,
+                              createdAt: createdAt,
+                              fullName: fullName,
+                              latitude: latitude,
+                              longitude: longitude,
+                              category: category,
+                              heroTag: heroTag,
+                            ),
                       ),
                     );
                   },
@@ -147,7 +145,8 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
                       if (imageBase64 != null)
                         ClipRRect(
                           borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(10)),
+                            top: Radius.circular(10),
+                          ),
                           child: Image.memory(
                             base64Decode(imageBase64),
                             fit: BoxFit.cover,
@@ -157,14 +156,18 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
                         ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
+                          horizontal: 10,
+                          vertical: 10,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               formatTime(createdAt),
                               style: const TextStyle(
-                                  fontSize: 12, color: Colors.grey),
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
                             const SizedBox(height: 6),
                             Text(category),
@@ -176,29 +179,37 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.edit,
-                                      color: Colors.blue),
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.blue,
+                                  ),
                                   onPressed: () {
                                     // Navigate to edit screen or implement edit functionality
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => EditPostScreen(
-                                          postId: posts[index].id,
-                                          imageBase64: imageBase64,
-                                          description: description,
-                                          category: category,
-                                        ),
+                                        builder:
+                                            (context) => EditPostScreen(
+                                              postId: posts[index].id,
+                                              imageBase64: imageBase64,
+                                              description: description,
+                                              category: category,
+                                            ),
                                       ),
                                     );
                                   },
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.red),
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
                                   onPressed: () async {
                                     // Call the delete function
-                                    await _deletePost(posts[index].id, this.context);
+                                    await _deletePost(
+                                      posts[index].id,
+                                      this.context,
+                                    );
                                   },
                                 ),
                               ],

@@ -59,7 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
     await FirebaseAuth.instance.signOut();
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const SignInScreen()));
+      MaterialPageRoute(builder: (context) => const SignInScreen()),
+    );
   }
 
   //ambil dari https://pastebin.com/8BXgdv3M
@@ -80,21 +81,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 ListTile(
                   leading: const Icon(Icons.clear),
                   title: const Text('Semua Kategori'),
-                  onTap: () => Navigator.pop(
-                    context,
-                    null,
-                  ), // Null untuk memilih semua kategori
+                  onTap:
+                      () => Navigator.pop(
+                        context,
+                        null,
+                      ), // Null untuk memilih semua kategori
                 ),
                 const Divider(),
                 ...categories.map(
                   (category) => ListTile(
                     title: Text(category),
-                    trailing: selectedCategory == category
-                        ? Icon(
-                            Icons.check,
-                            color: Theme.of(context).colorScheme.primary,
-                          )
-                        : null,
+                    trailing:
+                        selectedCategory == category
+                            ? Icon(
+                              Icons.check,
+                              color: Theme.of(context).colorScheme.primary,
+                            )
+                            : null,
                     onTap: () => Navigator.pop(context, category),
                   ),
                 ),
@@ -197,12 +200,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Expanded(
                   child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('posts')
-                        .doc(postId)
-                        .collection('comments')
-                        .orderBy('createdAt', descending: true)
-                        .snapshots(),
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection('posts')
+                            .doc(postId)
+                            .collection('comments')
+                            .orderBy('createdAt', descending: true)
+                            .snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
@@ -211,9 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       final comments = snapshot.data!.docs;
 
                       if (comments.isEmpty) {
-                        return const Center(
-                          child: Text('No comments yet.'),
-                        );
+                        return const Center(child: Text('No comments yet.'));
                       }
 
                       return ListView.builder(
@@ -228,13 +230,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           return ListTile(
                             title: Text(commenterName),
                             subtitle: Text(commentText),
-                            trailing: createdAt != null
-                                ? Text(
-                                    DateFormat('dd/MM/yyyy HH:mm')
-                                        .format(createdAt),
-                                    style: const TextStyle(fontSize: 12),
-                                  )
-                                : null,
+                            trailing:
+                                createdAt != null
+                                    ? Text(
+                                      DateFormat(
+                                        'dd/MM/yyyy HH:mm',
+                                      ).format(createdAt),
+                                      style: const TextStyle(fontSize: 12),
+                                    )
+                                    : null,
                           );
                         },
                       );
@@ -267,10 +271,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           commentController.clear();
 
                           final uid = FirebaseAuth.instance.currentUser?.uid;
-                          final userDoc = await FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(uid)
-                              .get();
+                          final userDoc =
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(uid)
+                                  .get();
                           final fullName =
                               userDoc.data()?['fullName'] ?? 'Anonymous';
 
@@ -279,11 +284,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               .doc(postId)
                               .collection('comments')
                               .add({
-                            'text': commentText,
-                            'name': fullName,
-                            'userId': uid,
-                            'createdAt': Timestamp.now(),
-                          });
+                                'text': commentText,
+                                'name': fullName,
+                                'userId': uid,
+                                'createdAt': Timestamp.now(),
+                              });
 
                           final commentRef = FirebaseFirestore.instance
                               .collection("posts")
@@ -292,8 +297,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           if (commentSnapshot.exists) {
                             final data = commentSnapshot.data()!;
-                            final comments =
-                                List<String>.from(data['comments'] ?? []);
+                            final comments = List<String>.from(
+                              data['comments'] ?? [],
+                            );
 
                             if (!comments.contains(currentUser.uid)) {
                               comments.add(currentUser.uid);
@@ -325,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
           .snapshots();
     } else {
       // Return posts filtered by the selected category
-       print("Filter by Category ${selectedCategory}");
+      print("Filter by Category ${selectedCategory}");
       return FirebaseFirestore.instance
           .collection("posts")
           .where("category", isEqualTo: selectedCategory)
@@ -359,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
               signOut(context);
             },
             icon: const Icon(Icons.logout),
-          )
+          ),
         ],
       ),
       body: RefreshIndicator(
@@ -389,8 +395,6 @@ class _HomeScreenState extends State<HomeScreen> {
               //print("Data " + snapshot.data!.docs.length.toString());
               return const Center(child: CircularProgressIndicator());
             }
-
-
 
             final posts = snapshot.data!.docs;
             //.where((doc) {
@@ -430,15 +434,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DetailScreen(
-                            imageBase64: imageBase64,
-                            description: description,
-                            createdAt: createdAt,
-                            fullName: fullName,
-                            latitude: latitude,
-                            longitude: longitude,
-                            category: category,
-                            heroTag: heroTag),
+                        builder:
+                            (context) => DetailScreen(
+                              imageBase64: imageBase64,
+                              description: description,
+                              createdAt: createdAt,
+                              fullName: fullName,
+                              latitude: latitude,
+                              longitude: longitude,
+                              category: category,
+                              heroTag: heroTag,
+                            ),
                       ),
                     );
                   },
@@ -453,15 +459,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (imageBase64 != null)
                           ClipRRect(
                             borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(10)),
-                            child: Image.memory(base64Decode(imageBase64),
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 200),
+                              top: Radius.circular(10),
+                            ),
+                            child: Image.memory(
+                              base64Decode(imageBase64),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: 200,
+                            ),
                           ),
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 10),
+                            horizontal: 10,
+                            vertical: 10,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -477,7 +488,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       Text(
                                         formatTime(createdAt),
                                         style: const TextStyle(
-                                            fontSize: 12, color: Colors.grey),
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                       Text(
                                         fullName,
@@ -487,7 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
                                       const SizedBox(height: 6),
-                                      Text(category)
+                                      Text(category),
                                     ],
                                   ),
                                   Row(
@@ -498,36 +511,37 @@ class _HomeScreenState extends State<HomeScreen> {
                                         children: [
                                           GestureDetector(
                                             onTap: () {
-                                              _toggleLike(posts[index]
-                                                  .id); // Panggil fungsi toggleLike
+                                              _toggleLike(
+                                                posts[index].id,
+                                              ); // Panggil fungsi toggleLike
                                             },
                                             child: Icon(
                                               Icons.thumb_up,
                                               size: 20,
-                                              color: (data['likes'] ?? [])
-                                                      .contains(
-                                                          _currentUserId)
-                                                  ? Colors.blue
-                                                  : Colors.grey,
+                                              color:
+                                                  (data['likes'] ?? [])
+                                                          .contains(
+                                                            _currentUserId,
+                                                          )
+                                                      ? Colors.blue
+                                                      : Colors.grey,
                                             ),
                                           ),
                                           if ((data['likes'] ?? []).length > 0)
                                             Row(
                                               children: [
-                                                SizedBox(
-                                                  width: 8,
-                                                ),
+                                                SizedBox(width: 8),
                                                 Text(
-                                                    '${(data['likes'] ?? []).length}', // Tampilkan jumlah likes
-                                                    style: const TextStyle(
-                                                        fontSize: 12)),
+                                                  '${(data['likes'] ?? []).length}', // Tampilkan jumlah likes
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                         ],
                                       ),
-                                      const SizedBox(
-                                        width: 16,
-                                      ),
+                                      const SizedBox(width: 16),
                                       //Comment Button
                                       Row(
                                         children: [
@@ -539,24 +553,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: Icon(
                                               Icons.comment,
                                               size: 20,
-                                              color: (data['comments'] ?? [])
-                                                      .contains(
-                                                          _currentUserId)
-                                                  ? Colors.blue
-                                                  : Colors.grey,
+                                              color:
+                                                  (data['comments'] ?? [])
+                                                          .contains(
+                                                            _currentUserId,
+                                                          )
+                                                      ? Colors.blue
+                                                      : Colors.grey,
                                             ),
                                           ),
                                           if ((data['comments'] ?? []).length >
                                               0)
                                             Row(
                                               children: [
-                                                SizedBox(
-                                                  width: 8,
-                                                ),
+                                                SizedBox(width: 8),
                                                 Text(
-                                                    '${(data['comments'] ?? []).length}', // Tampilkan jumlah komentar
-                                                    style: const TextStyle(
-                                                        fontSize: 12)),
+                                                  '${(data['comments'] ?? []).length}', // Tampilkan jumlah komentar
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                         ],
@@ -566,19 +582,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                       if (_currentUserId == userId)
                                         Row(
                                           children: [
-                                            const SizedBox(
-                                              width: 8,
-                                            ),
+                                            const SizedBox(width: 8),
                                             GestureDetector(
                                               onTap: () {
                                                 showModalBottomSheet(
                                                   context: context,
-                                                  shape:
-                                                      const RoundedRectangleBorder(
+                                                  shape: const RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.vertical(
-                                                      top: Radius.circular(24),
-                                                    ),
+                                                          top: Radius.circular(
+                                                            24,
+                                                          ),
+                                                        ),
                                                   ),
                                                   builder: (context) {
                                                     return SafeArea(
@@ -589,30 +604,33 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           //Menu Edit
                                                           ListTile(
                                                             leading: const Icon(
-                                                                Icons.edit),
+                                                              Icons.edit,
+                                                            ),
                                                             title: const Text(
-                                                                'Edit'),
+                                                              'Edit',
+                                                            ),
                                                             onTap: () {
                                                               Navigator.pop(
-                                                                  context); //close the modal
+                                                                context,
+                                                              ); //close the modal
 
                                                               // Navigate to edit screen or implement edit functionality
                                                               Navigator.push(
                                                                 context,
                                                                 MaterialPageRoute(
                                                                   builder:
-                                                                      (context) =>
-                                                                          EditPostScreen(
-                                                                    postId:
-                                                                        posts[index]
-                                                                            .id,
-                                                                    imageBase64:
-                                                                        imageBase64,
-                                                                    description:
-                                                                        description,
-                                                                    category:
-                                                                        category,
-                                                                  ),
+                                                                      (
+                                                                        context,
+                                                                      ) => EditPostScreen(
+                                                                        postId:
+                                                                            posts[index].id,
+                                                                        imageBase64:
+                                                                            imageBase64,
+                                                                        description:
+                                                                            description,
+                                                                        category:
+                                                                            category,
+                                                                      ),
                                                                 ),
                                                               );
                                                             },
@@ -620,15 +638,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           //Menu Hapus
                                                           ListTile(
                                                             leading: const Icon(
-                                                                Icons.delete),
+                                                              Icons.delete,
+                                                            ),
                                                             title: const Text(
-                                                                'Delete'),
+                                                              'Delete',
+                                                            ),
                                                             onTap: () async {
                                                               Navigator.pop(
-                                                                  context);
+                                                                context,
+                                                              );
                                                               _deletePost(
-                                                                  posts[index]
-                                                                      .id);
+                                                                posts[index].id,
+                                                              );
                                                             },
                                                           ),
                                                         ],
@@ -643,16 +664,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ),
                                           ],
-                                        )
+                                        ),
                                     ],
-                                  )
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 description ?? '',
                                 style: const TextStyle(fontSize: 16),
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -671,9 +692,9 @@ class _HomeScreenState extends State<HomeScreen> {
           FloatingActionButton(
             heroTag: "myPostButton",
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => MyPostsScreen()),
-              );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => MyPostsScreen()));
             },
             child: const Icon(Icons.person),
           ),
@@ -681,9 +702,9 @@ class _HomeScreenState extends State<HomeScreen> {
           FloatingActionButton(
             heroTag: "addPostButton",
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => AddPostScreen()),
-              );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (context) => AddPostScreen()));
             },
             child: const Icon(Icons.add),
           ),
